@@ -1,6 +1,7 @@
 package com.gmail.nossr50.datatypes.entity;
 
 import com.gmail.nossr50.datatypes.ArrowType;
+import org.jetbrains.annotations.NotNull;
 
 /*
  * Represents an Arrow
@@ -16,7 +17,8 @@ public class Arrow extends LaneEntity {
 	
 	public ArrowType getArrowDirection() { return at; }
 	
-	public String toASCIIArt() 
+	@NotNull
+	public String toASCIIArt()
 	{ 
 		String arrowPrefix = "?";
 		switch(getArrowDirection())
@@ -37,6 +39,6 @@ public class Arrow extends LaneEntity {
 			break;
 		
 		}
-		return new String("["+arrowPrefix+"Arw"+arrowPrefix+"]"); 
+		return "[" + arrowPrefix + "Arw" + arrowPrefix + "]";
 	}
 }

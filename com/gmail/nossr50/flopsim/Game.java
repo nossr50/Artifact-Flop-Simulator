@@ -7,6 +7,7 @@ import com.gmail.nossr50.datatypes.entity.EntityAlignment;
 import com.gmail.nossr50.datatypes.entity.EntityFactory;
 import com.gmail.nossr50.datatypes.entity.Hero;
 import com.gmail.nossr50.datatypes.lane.LaneState;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a game of artifact
@@ -20,8 +21,10 @@ public class Game {
 	private final ArrayList<Hero> radiantHeroChoices;
 	
 	//CombatEntity representation of the heros
-	public ArrayList<CombatEntity> enemyHeros 		= new ArrayList<CombatEntity>();
-	public ArrayList<CombatEntity> friendlyHeros 	= new ArrayList<CombatEntity>();
+	@NotNull
+	public ArrayList<CombatEntity> enemyHeros 		= new ArrayList<>();
+	@NotNull
+	public ArrayList<CombatEntity> friendlyHeros 	= new ArrayList<>();
 	
 	public Game(int uniqueSimId, ArrayList<Hero> direHeroChoices, ArrayList<Hero> radiantHeroChoices)
 	{
@@ -60,6 +63,7 @@ public class Game {
 	
 	private CombatEntity initHeroEntity(Hero hero, EntityAlignment ea)
 	{
+		System.out.println("Constructing hero named :" + hero.toString() +" ["+ea.toString()+"]");
 		return EntityFactory.makeHeroCombatEntity(hero, ea);
 	}
 	
@@ -102,7 +106,6 @@ public class Game {
 	/**
 	 * In order to avoid sending heros to already occupied lanes we check random lanes until we get one that is unoccupied
 	 * @param currentList Array of heros to add to random lanes
-	 * @param ea Alignment of heros
 	 */
 	private void addHerosToRandomLane(ArrayList<CombatEntity> currentList)
 	{
@@ -110,7 +113,7 @@ public class Game {
 		{
 			boolean assignedLane = false;
 			
-			while(assignedLane == false)
+			while(!assignedLane)
 			{
 				int randomLane = SimTools.getRandom(0, 2);
 				

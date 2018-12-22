@@ -29,7 +29,6 @@ public class SimTools {
 	{
 		String prefix = " [";
 		String suffix = "] ";
-		String combined = prefix + debugName + ": " + debugInfo + suffix;
-		return combined;
+        return prefix + debugName + ": " + debugInfo + suffix;
 	}
 }

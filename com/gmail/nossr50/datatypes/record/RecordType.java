@@ -7,5 +7,5 @@ public enum RecordType {
 	CREEP_KILLS,
 	HERO_KILLS,
 	HERO_DEATHS,
-	HERO_BLOCKS;
+	HERO_BLOCKS
 }

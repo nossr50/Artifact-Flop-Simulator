@@ -4,5 +4,5 @@ public enum LaneEntityType {
 	MELEE_CREEP,
 	HERO,
 	ARROW,
-	TOWER;
+	TOWER
 }

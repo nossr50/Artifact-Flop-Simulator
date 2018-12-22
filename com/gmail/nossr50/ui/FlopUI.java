@@ -12,6 +12,7 @@ import com.gmail.nossr50.datatypes.entity.Hero;
 import com.gmail.nossr50.datatypes.record.RecordType;
 import com.gmail.nossr50.datatypes.record.SumRecord;
 import com.gmail.nossr50.datatypes.record.Turn;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Helper class for easily updating specific UI elements
@@ -26,7 +27,7 @@ public class FlopUI {
 	 */
 	public FlopUI()
 	{
-		tableElements = new HashMap<StatElement, TableItem>();
+		tableElements = new HashMap<>();
 	}
 	
 	/**
@@ -86,7 +87,7 @@ public class FlopUI {
 	 * Setup our UI elements to our preferred defaults
 	 * @param heroDropDownWidgets Combo widgets representing Hero selection for the Sim
 	 */
-	public void initWidgets(ArrayList<Combo> heroDropDownWidgets)
+	public void initWidgets(@NotNull ArrayList<Combo> heroDropDownWidgets)
 	{
 		updateComboText(heroDropDownWidgets);
 	}

@@ -6,5 +6,5 @@ package com.gmail.nossr50.ui;
  *
  */
 public enum StatElement {
-	HEROS_BLOCKED; //Whether or not all 3 heros are blocked
+	HEROS_BLOCKED //Whether or not all 3 heros are blocked
 }

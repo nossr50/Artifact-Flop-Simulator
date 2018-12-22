@@ -7,6 +7,7 @@ import com.gmail.nossr50.datatypes.entity.CombatEntity;
 import com.gmail.nossr50.datatypes.entity.EntityStat;
 import com.gmail.nossr50.datatypes.record.Turn;
 import com.gmail.nossr50.flopsim.SimTools;
+import org.jetbrains.annotations.NotNull;
 
 import static com.gmail.nossr50.flopsim.SimTools.getDebugFormat;
 
@@ -46,6 +47,7 @@ public class AbilityInteraction {
      * @return the target stat of an ability interaction
      * @throws InvalidAbilityException
      */
+    @NotNull
     public EntityStat getTargetStat() throws InvalidAbilityException {
         switch (amt) {
             case AURA_ARMOR:

@@ -16,14 +16,17 @@ import com.gmail.nossr50.datatypes.record.SimRecord;
 import com.gmail.nossr50.datatypes.record.Turn;
 import com.gmail.nossr50.flopsim.combat.CombatManager;
 import com.gmail.nossr50.flopsim.combat.CombatTarget;
+import org.jetbrains.annotations.NotNull;
 
 public class Lane {
     private SimRecord simRecordRef;
 
-    public ArrayList<CombatEntity> combatEntities; //every combat entity in this lane
+    private ArrayList<CombatEntity> combatEntities; //every combat entity in this lane
 
-    public ArrayList<LaneEntity> predeploy_Dire = new ArrayList<LaneEntity>();
-    public ArrayList<LaneEntity> predeploy_Radiant = new ArrayList<LaneEntity>();
+    @NotNull
+    private ArrayList<LaneEntity> predeploy_Dire = new ArrayList<>();
+    @NotNull
+    private ArrayList<LaneEntity> predeploy_Radiant = new ArrayList<>();
 
     //Keeps track of whether or not a hero is assigned to this lane yet
     private boolean hasDireHero = false;
@@ -35,9 +38,10 @@ public class Lane {
 
 
     //Lane state vars
+    @NotNull
     private LaneState state = LaneState.FRESH;
     private Turn currentTurn;
-    int curTurnCount = 0;
+    private int curTurnCount = 0;
 
     //Towers
     private Tower direTower;
@@ -52,11 +56,11 @@ public class Lane {
         direTower = EntityFactory.makeTower(EntityAlignment.DIRE);
         radiantTower = EntityFactory.makeTower(EntityAlignment.RADIANT);
         this.simRecordRef = simRecordRef; //The SimRecord related to this particular simulation
-        combatEntities = new ArrayList<CombatEntity>();
+        combatEntities = new ArrayList<>();
     }
 
     //TODO: Rewrite this garbo
-    public void AddCombatEntity(CombatEntity ce) {
+    public void AddCombatEntity(@NotNull CombatEntity ce) {
         //Add all combat entities to this list for combat stages
         combatEntities.add(ce);
 
@@ -276,12 +280,12 @@ public class Lane {
         updateLanePositions(deployed_Enemies, deployed_Friendlies);
     }
 
-    private void updateLanePositions(LaneEntity[] direEntities, LaneEntity[] radiantEntities) {
+    private void updateLanePositions(LaneEntity[] direEntities, @NotNull LaneEntity[] radiantEntities) {
         int lanePos = 0;
         int laneSize = direEntities.length; //Dire and Radiant entities should always be the same size, which is the size of the lane
 
         System.out.println("Lane position : " + lanePos + ", Size :" + laneSize);
-        while (lanePos < laneSize - 1) {
+        while (lanePos < laneSize) {
             System.out.println("Iteration: " + lanePos);
             makeLanePosition(direEntities, radiantEntities, lanePos, direEntities.length);
             makeLanePosition(radiantEntities, direEntities, lanePos, radiantEntities.length);
@@ -297,7 +301,7 @@ public class Lane {
      * @param lanePos  Current position in the array
      * @param laneSize Size of the lane
      */
-    private void makeLanePosition(LaneEntity[] allies, LaneEntity[] enemies, int lanePos, int laneSize) {
+    private void makeLanePosition(LaneEntity[] allies, @NotNull LaneEntity[] enemies, int lanePos, int laneSize) {
         if (!allies[lanePos].isArrow()) {
             /*
              * Combat Entity Found
@@ -336,14 +340,15 @@ public class Lane {
         }
     }
 
+    @NotNull
     private LaneEntity[] deployLaneEntities(ArrayList<LaneEntity> currentList) {
         LaneEntity[] newDestinationArray = new LaneEntity[currentList.size()];
 
         for (LaneEntity le : currentList) {
             boolean assigned = false;
 
-            while (assigned == false) {
-                int newPos = getRandom(0, newDestinationArray.length - 1);
+            while (!assigned) {
+                int newPos = getRandom(newDestinationArray.length - 1);
 
                 if (newDestinationArray[newPos] == null) {
                     newDestinationArray[newPos] = le;
@@ -358,8 +363,7 @@ public class Lane {
     }
 
     private int getLaneSize() {
-        int laneSize = predeploy_Dire.size() >= predeploy_Radiant.size() ? predeploy_Dire.size() : predeploy_Radiant.size();
-        return laneSize;
+        return predeploy_Dire.size() >= predeploy_Radiant.size() ? predeploy_Dire.size() : predeploy_Radiant.size();
     }
 
     /*
@@ -382,6 +386,7 @@ public class Lane {
         entityArray.add(new Arrow(LaneEntityType.ARROW, at));
     }
 
+    @NotNull
     private ArrayList<LaneEntity> getEntityArray(EntityAlignment ea) {
         if (ea == EntityAlignment.DIRE)
             return predeploy_Dire;
@@ -389,6 +394,7 @@ public class Lane {
             return predeploy_Radiant;
     }
 
+    @NotNull
     private ArrowType getRandomArrow() {
         Random random = new Random();
         switch (random.nextInt(3) + 1) {
@@ -409,8 +415,7 @@ public class Lane {
     }
 
     public boolean hasHero(EntityAlignment ea) {
-        boolean hasHero = ea == EntityAlignment.RADIANT ? hasRadiantHero : hasDireHero;
-        return hasHero;
+        return ea == EntityAlignment.RADIANT ? hasRadiantHero : hasDireHero;
     }
 
     public void printDebugStatus() {
@@ -418,44 +423,49 @@ public class Lane {
         System.out.println("Good Hero Present?: " + hasRadiantHero + "  || Friend Count: " + predeploy_Radiant.size());
     }
 
-    public void printDebugPostDeployStatus() {
-        for (LaneEntity le : deployed_Enemies) {
-            String output = "";
-            if (le instanceof CombatEntity) {
-                CombatEntity ce = (CombatEntity) le;
-
-                output += ce.toString();
-                System.out.println(output);
-            }
-        }
-
-        for (LaneEntity le : deployed_Friendlies) {
-            String output = "";
-            if (le instanceof CombatEntity) {
-                CombatEntity ce = (CombatEntity) le;
-
-                output += ce.toString();
-                System.out.println(output);
-            }
-        }
+    private void printDebugPostDeployStatus() {
+        printPostDeployStatus(deployed_Enemies);
+        printPostDeployStatus(deployed_Friendlies);
 
         System.out.println();
     }
 
-    private int getRandom(int min, int max) {
-        Random random = new Random();
-        return random.nextInt(max + 1) + min;
+    private void printPostDeployStatus(LaneEntity[] laneEntities) {
+        for (LaneEntity le : laneEntities) {
+            String output = "";
+            if (le instanceof CombatEntity) {
+                CombatEntity ce = (CombatEntity) le;
+
+                output += ce.toString();
+                System.out.println(output);
+            }
+        }
     }
 
+    private int getRandom(int max) {
+        Random random = new Random();
+        return random.nextInt(max + 1) + 0;
+    }
+
+    @NotNull
     public LaneState getLaneState() {
         return state;
     }
 
-    public void printLaneASCIIArt() {
+    private void printLaneASCIIArt() {
         String radiantLaneASCII = "";
         String direLaneASCII = "";
 
-        for (LaneEntity le : deployed_Enemies) {
+        radiantLaneASCII = buildLaneASCII(radiantLaneASCII, deployed_Enemies);
+        direLaneASCII = buildLaneASCII(direLaneASCII, deployed_Friendlies);
+
+        System.out.println("Lane visualization");
+        System.out.println(direLaneASCII);
+        System.out.println(radiantLaneASCII);
+    }
+
+    private String buildLaneASCII(String radiantLaneASCII, LaneEntity[] deployed_enemies) {
+        for (LaneEntity le : deployed_enemies) {
             if (le instanceof Arrow)
                 radiantLaneASCII += ((Arrow) le).toASCIIArt();
             if (le instanceof CombatEntity)
@@ -463,18 +473,6 @@ public class Lane {
 
             radiantLaneASCII += " ";
         }
-
-        for (LaneEntity le : deployed_Friendlies) {
-            if (le instanceof Arrow)
-                direLaneASCII += ((Arrow) le).toASCIIArt();
-            if (le instanceof CombatEntity)
-                direLaneASCII += ((CombatEntity) le).toASCIIArt();
-
-            direLaneASCII += " ";
-        }
-
-        System.out.println("Lane visualization");
-        System.out.println(direLaneASCII);
-        System.out.println(radiantLaneASCII);
+        return radiantLaneASCII;
     }
 }

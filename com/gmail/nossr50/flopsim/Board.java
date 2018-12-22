@@ -4,6 +4,7 @@ import com.gmail.nossr50.datatypes.entity.CombatEntity;
 import com.gmail.nossr50.datatypes.lane.Lane;
 import com.gmail.nossr50.datatypes.record.SimRecord;
 import com.gmail.nossr50.datatypes.record.SumRecord;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the artifact game board
@@ -27,7 +28,7 @@ public class Board {
 		lanes[2] = new Lane(newSimRecord);
 	}
 	
-	public void addEntitiesToLane(int pos, CombatEntity ce)
+	public void addEntitiesToLane(int pos, @NotNull CombatEntity ce)
 	{
 		lanes[pos].AddCombatEntity(ce); //Adding entity
 	}

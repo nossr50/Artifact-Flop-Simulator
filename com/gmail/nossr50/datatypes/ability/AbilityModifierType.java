@@ -11,5 +11,5 @@ public enum AbilityModifierType {
 	REGEN,
 	RETALIATE,
 	CLEAVE,
-	PIERCE_DAMAGE;
+	PIERCE_DAMAGE
 }

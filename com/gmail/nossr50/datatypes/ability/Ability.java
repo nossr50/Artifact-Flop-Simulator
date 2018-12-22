@@ -7,11 +7,12 @@ import com.gmail.nossr50.datatypes.entity.EntityStat;
 import com.gmail.nossr50.datatypes.lane.LanePosition;
 import com.gmail.nossr50.datatypes.record.Turn;
 import com.gmail.nossr50.flopsim.combat.AbilityInteraction;
+import org.jetbrains.annotations.NotNull;
 
 public class Ability {
 
     public final HeroAbility heroAbility;
-    public final CombatEntity source; //owner
+    private final CombatEntity source; //owner
 
 
     public Ability(CombatEntity source, HeroAbility at) {
@@ -24,7 +25,7 @@ public class Ability {
      *
      * @return Ability's value modifier
      */
-    public int getValue() {
+    private int getValue() {
         //Greater cleave is rounded down
         if (heroAbility == HeroAbility.GREAT_CLEAVE) {
             //Java rounds down to zero automatically
@@ -48,10 +49,22 @@ public class Ability {
      *
      * @param turn Turn that the game is currently on
      */
-    public void addAbilityInteraction(Turn turn) {
+    public void addAbilityInteraction(@NotNull Turn turn) {
         LanePosition lp = source.getLanePosition(); //LanePosition has positional data relating to abilities
-        ArrayList<CombatEntity> abilityTargets = lp.getTargetEntities(this); //This grabs all applicable targets for an ability, and its empty if there are none.
 
+        //DEBUG
+        if(lp == null)
+            System.out.println("LP is null!");
+        if(lp.getEnemyNeighbors() == null)
+            System.out.println("Enemy neighbors are null");
+        if(lp.getAlliedNeighbors() == null)
+            System.out.println("Allied neighbors are null");
+        if(lp.getEnemiesInLane() == null)
+            System.out.println("Enemies in lane are null");
+
+        ArrayList<CombatEntity> abilityTargets = new ArrayList<>();
+        //This grabs all applicable targets for an ability, and its empty if there are none.
+        lp.getTargetEntities(abilityTargets, this.getAbilityTargetType());
 
         //Special Abilities have complex rules and need their own code
         if (heroAbility.isAbilitySpecial()) {
@@ -65,7 +78,7 @@ public class Ability {
         //TODO: Check ability target code
     }
 
-    private void addReactiveArmorInteraction(Turn turn, ArrayList<CombatEntity> abilityTargets) {
+    private void addReactiveArmorInteraction(@NotNull Turn turn, ArrayList<CombatEntity> abilityTargets) {
         AbilityInteraction newInteraction;
         int reactiveArmorValue = -1;
 
@@ -74,7 +87,7 @@ public class Ability {
 
             //Apply -1 armor to attackers
             if (target != source)
-                newInteraction = new AbilityInteraction(source, target, heroAbility.getModifierType(), heroAbility.getAbilityType(), -1, turn);
+                newInteraction = new AbilityInteraction(source, target, heroAbility.getModifierType(), heroAbility.getAbilityType(), reactiveArmorValue, turn);
             else
                 newInteraction = new AbilityInteraction(source, target, heroAbility.getModifierType(), heroAbility.getAbilityType(), getReactiveArmorValue(abilityTargets), turn);
 
@@ -104,7 +117,7 @@ public class Ability {
         return value;
     }
 
-    private void addAbilityInteraction(Turn turn, ArrayList<CombatEntity> abilityTargets) {
+    private void addAbilityInteraction(@NotNull Turn turn, ArrayList<CombatEntity> abilityTargets) {
         for (CombatEntity target : abilityTargets) {
             if (getConditionsFulfilled(target)) {
                 System.out.println("[DEBUG] Adding ability interaction from " + source.toString() + " via " + heroAbility.toString());
@@ -115,44 +128,29 @@ public class Ability {
     }
 
     public boolean isTriggeredOnDefense() {
-        if (heroAbility == HeroAbility.MOMENT_OF_COURAGE
+        return heroAbility == HeroAbility.MOMENT_OF_COURAGE
                 || heroAbility == HeroAbility.CORROSIVE_SKIN
-                || heroAbility == HeroAbility.RETURN) {
-            return true;
-        } else {
-            return false;
-        }
+                || heroAbility == HeroAbility.RETURN;
     }
 
     public boolean isRetaliate() {
-        if (heroAbility == HeroAbility.MOMENT_OF_COURAGE || heroAbility == HeroAbility.RETURN) {
-            return true;
-        } else {
-            return false;
-        }
+        return heroAbility == HeroAbility.MOMENT_OF_COURAGE || heroAbility == HeroAbility.RETURN;
     }
 
     public boolean isDefensiveDebuff() {
-        if (heroAbility == HeroAbility.CORROSIVE_SKIN)
-            return true;
-        else
-            return false;
+        return heroAbility == HeroAbility.CORROSIVE_SKIN;
     }
 
     public boolean isTriggeredOnAttack() {
-        if (heroAbility == HeroAbility.FURY_SWIPES) {
-            return true;
-        } else {
-            return false;
-        }
+        return heroAbility == HeroAbility.FURY_SWIPES;
     }
 
-    private void triggerRetaliate(CombatEntity target) {
+    private void triggerRetaliate(@NotNull CombatEntity target) {
         if (getConditionsFulfilled(target))
             target.addPendingStatChange(EntityStat.HEALTH, getValue());
     }
 
-    public void triggerDefensiveSkill(CombatEntity target, Turn turn) {
+    public void triggerDefensiveSkill(@NotNull CombatEntity target, @NotNull Turn turn) {
         if (getConditionsFulfilled(target)) {
             //NOTE: Retaliate can trigger defensive skills
             if (heroAbility == HeroAbility.MOMENT_OF_COURAGE || heroAbility == HeroAbility.RETURN) {
@@ -168,7 +166,7 @@ public class Ability {
         }
     }
 
-    public void triggerOffensiveSkill(CombatEntity target, Turn turn) {
+    public void triggerOffensiveSkill(@NotNull CombatEntity target, @NotNull Turn turn) {
         if (getConditionsFulfilled(target)) {
             if (heroAbility == HeroAbility.FURY_SWIPES) {
                 target.addPendingStatChange(EntityStat.ARMOR, getValue());
@@ -179,7 +177,7 @@ public class Ability {
         }
     }
 
-    public boolean getConditionsFulfilled(CombatEntity target) {
+    private boolean getConditionsFulfilled(@NotNull CombatEntity target) {
         switch (heroAbility.getAbilityRequirement()) {
             case TARGET_NON_CREEP:
                 if (target.isHero() || target.isTower())

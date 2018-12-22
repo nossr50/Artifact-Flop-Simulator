@@ -24,6 +24,7 @@ import com.gmail.nossr50.datatypes.record.SumRecord;
 import com.gmail.nossr50.flopsim.FlopSimManager;
 import com.gmail.nossr50.ui.FlopUI;
 import com.gmail.nossr50.ui.StatElement;
+import org.jetbrains.annotations.NotNull;
 
 public class FlopWindow {
 
@@ -76,7 +77,7 @@ public class FlopWindow {
 		/*
 		 * init our dropdowns
 		 */
-		ArrayList<Combo> heroDropDownWidgets = new ArrayList<Combo>();
+		ArrayList<Combo> heroDropDownWidgets = new ArrayList<>();
 		
 		Menu menu = new Menu(shlArtifactFlopSim, SWT.BAR);
 		shlArtifactFlopSim.setMenuBar(menu);
@@ -101,45 +102,45 @@ public class FlopWindow {
 		lblOpponentHeros.setBounds(317, 22, 99, 15);
 		lblOpponentHeros.setText("Opponent Heros");
 		
-		Combo drpOppHero1 = new Combo(grpFlopConfig, SWT.NONE);
-		drpOppHero1.setBounds(317, 43, 200, 23);
-		drpOppHero1.setText("Zeus");
+		Combo direHero1 = new Combo(grpFlopConfig, SWT.NONE);
+		direHero1.setBounds(317, 43, 200, 23);
+		direHero1.setText("Zeus");
 		
-		Combo drpOppHero2 = new Combo(grpFlopConfig, SWT.NONE);
-		drpOppHero2.setBounds(523, 43, 200, 23);
-		drpOppHero2.setText("Legion Commander");
+		Combo direHero2 = new Combo(grpFlopConfig, SWT.NONE);
+		direHero2.setBounds(523, 43, 200, 23);
+		direHero2.setText("Legion Commander");
 		
-		Combo drpOppHero3 = new Combo(grpFlopConfig, SWT.NONE);
-		drpOppHero3.setBounds(729, 43, 200, 23);
-		drpOppHero3.setText("Drow");
+		Combo direHero3 = new Combo(grpFlopConfig, SWT.NONE);
+		direHero3.setBounds(729, 43, 200, 23);
+		direHero3.setText("Drow");
 		
 		Label lblRadiantHeros = new Label(grpFlopConfig, SWT.NONE);
 		lblRadiantHeros.setText("Your Heros");
 		lblRadiantHeros.setBounds(317, 72, 99, 15);
 		
-		Combo drpOurHero1 = new Combo(grpFlopConfig, SWT.NONE);
-		drpOurHero1.setBounds(317, 93, 200, 23);
-		drpOurHero1.setText("Tinker");
+		Combo radiantHero1 = new Combo(grpFlopConfig, SWT.NONE);
+		radiantHero1.setBounds(317, 93, 200, 23);
+		radiantHero1.setText("Tinker");
 		
-		Combo drpOurHero2 = new Combo(grpFlopConfig, SWT.NONE);
-		drpOurHero2.setBounds(523, 93, 200, 23);
-		drpOurHero2.setText("Bounty Hunter");
+		Combo radiantHero2 = new Combo(grpFlopConfig, SWT.NONE);
+		radiantHero2.setBounds(523, 93, 200, 23);
+		radiantHero2.setText("Bounty Hunter");
 		
-		Combo drpOurHero3 = new Combo(grpFlopConfig, SWT.NONE);
-		drpOurHero3.setBounds(729, 93, 200, 23);
-		drpOurHero3.setText("Axe");
+		Combo radiantHero3 = new Combo(grpFlopConfig, SWT.NONE);
+		radiantHero3.setBounds(729, 93, 200, 23);
+		radiantHero3.setText("Axe");
 		
 		/*
 		 * Adding the drop down menus to an array to make it easier to manipulate them all at once
 		 */
 		
-		heroDropDownWidgets.add(drpOppHero1);
-		heroDropDownWidgets.add(drpOppHero2);
-		heroDropDownWidgets.add(drpOppHero3);
+		heroDropDownWidgets.add(direHero1);
+		heroDropDownWidgets.add(direHero2);
+		heroDropDownWidgets.add(direHero3);
 		
-		heroDropDownWidgets.add(drpOurHero1);
-		heroDropDownWidgets.add(drpOurHero2);
-		heroDropDownWidgets.add(drpOurHero3);
+		heroDropDownWidgets.add(radiantHero1);
+		heroDropDownWidgets.add(radiantHero2);
+		heroDropDownWidgets.add(radiantHero3);
 		
 		Button btnStartSim = new Button(grpFlopConfig, SWT.NONE);
 		
@@ -150,17 +151,17 @@ public class FlopWindow {
 				/*
 				 * Grab hero choices from GUI
 				 */
-				ArrayList<Hero> enemyHeroList = new ArrayList<Hero>();
-				ArrayList<Hero> goodHeroList = new ArrayList<Hero>();
+				ArrayList<Hero> enemyHeroList = new ArrayList<>();
+				ArrayList<Hero> goodHeroList = new ArrayList<>();
 				ArrayList<Hero> choosenHeros = getHeros(heroDropDownWidgets);
 				
 				enemyHeroList.add(choosenHeros.get(0));
 				enemyHeroList.add(choosenHeros.get(1));
 				enemyHeroList.add(choosenHeros.get(2));
 				
-				goodHeroList.add(choosenHeros.get(0));
-				goodHeroList.add(choosenHeros.get(1));
-				goodHeroList.add(choosenHeros.get(2));
+				goodHeroList.add(choosenHeros.get(3));
+				goodHeroList.add(choosenHeros.get(4));
+				goodHeroList.add(choosenHeros.get(5));
 				
 				/*
 				 * Start the simulation
@@ -243,9 +244,10 @@ public class FlopWindow {
 	/*
 	 * Dumbo way to do this I'll change it later
 	 */
+	@NotNull
 	private ArrayList<Hero> getHeros(ArrayList<Combo> dropDownWidgets)
 	{
-		ArrayList<Hero> dropDownChoices = new ArrayList<Hero>();
+		ArrayList<Hero> dropDownChoices = new ArrayList<>();
 		for(Combo c : dropDownWidgets)
 		{
 			Hero h = Hero.values()[c.getSelectionIndex()];

@@ -10,6 +10,7 @@ import com.gmail.nossr50.flopsim.SimTools;
 import com.gmail.nossr50.flopsim.combat.AbilityInteraction;
 import com.gmail.nossr50.flopsim.combat.CombatTarget;
 import com.gmail.nossr50.flopsim.combat.DamageType;
+import org.jetbrains.annotations.NotNull;
 
 public class CombatEntity extends LaneEntity {
 
@@ -75,11 +76,11 @@ public class CombatEntity extends LaneEntity {
             this.ability = new Ability(this, heroAbility);
 
         //All interactions with this entity are logged and done through this
-        queuedInteractions = new ArrayList<AbilityInteraction>();
-        removedInteractions = new ArrayList<AbilityInteraction>();
-        activeCombatModifierInteractions = new ArrayList<AbilityInteraction>();
-        currentAuras = new ArrayList<Aura>(); //Init auras
-        pendingStatChange = new HashMap<EntityStat, Integer>();
+        queuedInteractions = new ArrayList<>();
+        removedInteractions = new ArrayList<>();
+        activeCombatModifierInteractions = new ArrayList<>();
+        currentAuras = new ArrayList<>(); //Init auras
+        pendingStatChange = new HashMap<>();
 
         for (EntityStat es : EntityStat.values()) {
             pendingStatChange.put(es, 0);
@@ -244,7 +245,7 @@ public class CombatEntity extends LaneEntity {
         currentAuras.add(newAura);
     }
 
-    public void addPendingStatChange(EntityStat targetStat, int modifier) {
+    public void addPendingStatChange(@NotNull EntityStat targetStat, int modifier) {
         System.out.println("pending stat change [" + targetStat.toString() + " " + modifier + "] for " + toString());
         int old = pendingStatChange.get(targetStat);
         pendingStatChange.put(targetStat, (old + modifier));
@@ -262,7 +263,7 @@ public class CombatEntity extends LaneEntity {
      *
      * @param source Source of the melee combat damage
      */
-    public void dealMeleeCombatDamage(CombatEntity source, Turn turn, DamageType damageType) {
+    public void dealMeleeCombatDamage(@NotNull CombatEntity source, @NotNull Turn turn, DamageType damageType) {
         int incDamage = source.getCurrentAttack();
 
         dealDamage(incDamage, damageType);
@@ -293,7 +294,7 @@ public class CombatEntity extends LaneEntity {
     }
 
 
-    public void dealRetaliateDamage(CombatEntity source, Turn turn) {
+    public void dealRetaliateDamage(@NotNull CombatEntity source, @NotNull Turn turn) {
         /*
          * This code is run when this entity is being hit with retaliate damage which is processed seperately from attack
          * Retaliate can trigger offensive skills
@@ -323,7 +324,8 @@ public class CombatEntity extends LaneEntity {
         return lp;
     }
 
+    @NotNull
     public String toASCIIArt() {
-        return new String("[" + SimTools.getShorter(entityName, 5) + "]");
+        return "[" + SimTools.getShorter(entityName, 5) + "]";
     }
 }

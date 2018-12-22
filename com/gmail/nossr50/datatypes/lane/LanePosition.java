@@ -3,12 +3,17 @@ package com.gmail.nossr50.datatypes.lane;
 import java.util.ArrayList;
 
 import com.gmail.nossr50.datatypes.ability.Ability;
+import com.gmail.nossr50.datatypes.ability.AbilityTargetType;
 import com.gmail.nossr50.datatypes.entity.CombatEntity;
 import com.gmail.nossr50.datatypes.entity.LaneEntity;
 import com.gmail.nossr50.flopsim.SimTools;
+import org.jetbrains.annotations.NotNull;
 
 public class LanePosition {
     private final CombatEntity self; //Entity in this position (not sure if needed)
+
+
+
     private ArrayList<CombatEntity> alliedNeighbors; //Neighbors that are allies
     private ArrayList<CombatEntity> enemyNeighbors; //Neighbors that are not so nice
     private ArrayList<CombatEntity> enemiesInLane; //All other enemies in the lane
@@ -17,9 +22,9 @@ public class LanePosition {
         this.self = entity;
 
         //Init array lists
-        alliedNeighbors = new ArrayList<CombatEntity>();
-        enemyNeighbors = new ArrayList<CombatEntity>();
-        enemiesInLane = new ArrayList<CombatEntity>();
+        alliedNeighbors = new ArrayList<>();
+        enemyNeighbors = new ArrayList<>();
+        enemiesInLane = new ArrayList<>();
     }
 
     public void addAlliedNeighbor(CombatEntity ce) {
@@ -66,12 +71,12 @@ public class LanePosition {
         }
     }
 
-    public ArrayList<CombatEntity> getTargetEntities(Ability ability) {
+    @NotNull
+    public void getTargetEntities(@NotNull ArrayList<CombatEntity> targetEntities, AbilityTargetType abilityTargetType) {
         System.out.println("Grabbing targets");
-        ArrayList<CombatEntity> targetEntities = new ArrayList<CombatEntity>();
-        CombatEntity currentTarget = self.getCombatTarget().getTarget();
+        @NotNull CombatEntity currentTarget = self.getCombatTarget().getTarget();
 
-        switch (ability.getAbilityTargetType()) {
+        switch (abilityTargetType) {
             case SELF_AND_ATTACKER:
                 targetEntities.addAll(getAttackers());
                 targetEntities.add(self);
@@ -116,12 +121,12 @@ public class LanePosition {
                 break;
         }
         //TODO: Add better debugging?
-        System.out.println("Targets found: " + targetEntities.size() +" for ability "+ability.heroAbility.toString());
-        return targetEntities;
+        System.out.println("Targets found: " + targetEntities.size() +" for ability ");
     }
 
+    @NotNull
     private ArrayList<CombatEntity> getAttackers() {
-        ArrayList<CombatEntity> attackers = new ArrayList<CombatEntity>();
+        ArrayList<CombatEntity> attackers = new ArrayList<>();
 
         for (CombatEntity ce : getEnemyNeighbors()) {
             if (ce.getCombatTarget().getTarget() == self) {
@@ -133,8 +138,9 @@ public class LanePosition {
     }
 
     //TODO: Check randomness
-    public ArrayList<CombatEntity> getRandom(ArrayList<CombatEntity> potentialTargets) {
-        ArrayList<CombatEntity> randomTarget = new ArrayList<CombatEntity>();
+    @NotNull
+    private ArrayList<CombatEntity> getRandom(ArrayList<CombatEntity> potentialTargets) {
+        ArrayList<CombatEntity> randomTarget = new ArrayList<>();
 
         int randomChoice = SimTools.getRandom(0, potentialTargets.size() - 1);
 
@@ -143,9 +149,9 @@ public class LanePosition {
         return randomTarget;
     }
 
-    public CombatEntity getCombatEntity() {
-        return self;
-    }
+//    public CombatEntity getCombatEntity() {
+//        return self;
+//    }
 
     public ArrayList<CombatEntity> getAlliedNeighbors() {
         return alliedNeighbors;
@@ -153,5 +159,9 @@ public class LanePosition {
 
     public ArrayList<CombatEntity> getEnemyNeighbors() {
         return enemyNeighbors;
+    }
+
+    public ArrayList<CombatEntity> getEnemiesInLane() {
+        return enemiesInLane;
     }
 }

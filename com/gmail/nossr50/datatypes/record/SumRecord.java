@@ -3,6 +3,7 @@ package com.gmail.nossr50.datatypes.record;
 import java.util.ArrayList;
 
 import com.gmail.nossr50.datatypes.entity.EntityAlignment;
+import org.jetbrains.annotations.NotNull;
 
 /*
  * I'm terrible with names
@@ -11,8 +12,10 @@ import com.gmail.nossr50.datatypes.entity.EntityAlignment;
  */
 public class SumRecord {
 	private static int totalSimulations = 0;
-	private static ArrayList<SimRecord> simRecords = new ArrayList<SimRecord>(); //Copy of data from all simulations
+	@NotNull
+	private static ArrayList<SimRecord> simRecords = new ArrayList<>(); //Copy of data from all simulations
 	
+	@NotNull
 	static public SimRecord makeRecord()
 	{
 		SimRecord newRecord = new SimRecord(totalSimulations);
@@ -21,7 +24,7 @@ public class SumRecord {
 		return newRecord;
 	}
 	
-	public int getFactionStatsByTurn(EntityAlignment ea, Turn turn, RecordType stat)
+	public int getFactionStatsByTurn(EntityAlignment ea, @NotNull Turn turn, @NotNull RecordType stat)
 	{
 		int statSum = 0;
 		
@@ -34,12 +37,12 @@ public class SumRecord {
 		return statSum;
 	}
 	
-	public int getRadiantStatsByTurn(Turn turn, RecordType stat)
+	public int getRadiantStatsByTurn(@NotNull Turn turn, @NotNull RecordType stat)
 	{
 		return getFactionStatsByTurn(EntityAlignment.RADIANT, turn, stat);
 	}
 	
-	public int getDireStatsByTurn(Turn turn, RecordType stat)
+	public int getDireStatsByTurn(@NotNull Turn turn, @NotNull RecordType stat)
 	{
 		return getFactionStatsByTurn(EntityAlignment.DIRE, turn, stat);
 	}
@@ -51,7 +54,7 @@ public class SumRecord {
 	}
 	*/
 	
-	static public double getStatAboveThreshold(EntityAlignment ea, Turn turn, RecordType stat, int threshold)
+	static public double getStatAboveThreshold(EntityAlignment ea, @NotNull Turn turn, @NotNull RecordType stat, int threshold)
 	{
 		double sampleSize = simRecords.size();
 		double statSum = 0.0; //Everytime the stat is true we add 1

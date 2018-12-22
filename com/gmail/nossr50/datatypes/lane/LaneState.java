@@ -7,5 +7,5 @@ public enum LaneState {
 	PRE_ACTION,
 	PRE_COMBAT,
 	POST_COMBAT,
-	FINISHED;
+	FINISHED
 }

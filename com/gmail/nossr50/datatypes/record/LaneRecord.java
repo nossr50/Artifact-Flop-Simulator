@@ -3,6 +3,7 @@ package com.gmail.nossr50.datatypes.record;
 import java.util.HashMap;
 
 import com.gmail.nossr50.datatypes.entity.EntityAlignment;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a lane in our records
@@ -17,8 +18,8 @@ public class LaneRecord {
 	public LaneRecord()
 	{
 		//Init maps
-		radiantRecords 	= new HashMap<Integer, TurnRecord>();
-		direRecords 	= new HashMap<Integer, TurnRecord>();
+		radiantRecords 	= new HashMap<>();
+		direRecords 	= new HashMap<>();
 		
 		/*
 		 * Init records
@@ -33,7 +34,7 @@ public class LaneRecord {
 		direRecords.put(1, new TurnRecord(1)); //Second turn
 	}
 	
-	public TurnRecord getRecord(EntityAlignment ea, Turn turn)
+	public TurnRecord getRecord(EntityAlignment ea, @NotNull Turn turn)
 	{
 		return getRecord(ea, turn.getIndex());
 	}
@@ -58,12 +59,12 @@ public class LaneRecord {
 		return direRecords.get(index);
 	}
 	
-	public TurnRecord getRadiantRecord(Turn turn)
+	public TurnRecord getRadiantRecord(@NotNull Turn turn)
 	{
 		return getRadiantRecord(turn.getIndex());
 	}
 	
-	public TurnRecord getDireRecord(Turn turn)
+	public TurnRecord getDireRecord(@NotNull Turn turn)
 	{
 		return getDireRecord(turn.getIndex());
 	}

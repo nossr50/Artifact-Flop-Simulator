@@ -1,5 +1,7 @@
 package com.gmail.nossr50.datatypes.record;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Records data for a specific turn
  * @author nossr50
@@ -36,7 +38,7 @@ public class TurnRecord {
 	public void addCreepKills(int x) { creepKills+=x; }
 	public void addHeroKills(int x) { heroKills+=x; }
 	
-	public void addStat(RecordType stat, int x)
+	public void addStat(@NotNull RecordType stat, int x)
 	{
 		switch(stat)
 		{
@@ -68,7 +70,7 @@ public class TurnRecord {
 		}
 	}
 	
-	public int getStat(RecordType stat)
+	public int getStat(@NotNull RecordType stat)
 	{
 		switch(stat)
 		{

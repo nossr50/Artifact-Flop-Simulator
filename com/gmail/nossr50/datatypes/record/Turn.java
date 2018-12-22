@@ -11,7 +11,7 @@ public enum Turn {
 	
 	final private int index;
 	
-	private Turn (int index)
+	Turn (int index)
 	{
 		this.index = index;
 	}
