@@ -1,6 +1,6 @@
 package com.gmail.nossr50.datatypes.ability;
 
 public enum AbilityType {
-	NORMAL, //Normal is basically nearly every type of ability
-	SPECIAL; //Special are abilities which do special things that need their own unique snowflake code
+	NORMAL, //For most abilities in Artifact we can have them fit into a nice framework that treats them all as different flavours of the same ice cream
+	SPECIAL //Special is for abilities with complex rules requiring special snowflake code
 }

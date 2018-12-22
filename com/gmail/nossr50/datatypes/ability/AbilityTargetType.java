@@ -2,11 +2,9 @@ package com.gmail.nossr50.datatypes.ability;
 
 public enum AbilityTargetType {
 	SELF,
-	BLOCKER,
-	COMBAT_TARGET_ALL,
-	COMBAT_TARGET_TOWER,
-	COMBAT_TARGET_HERO,
-	COMBAT_TARGET_HERO_OR_TOWER,
+	ATTACKER, //Entities attacking us
+	SELF_AND_ATTACKER,
+	BLOCKER, //Maybe should be reworded to defender?
 	GLOBAL_ALLIES,
 	GLOBAL_ENEMIES,
 	ALLIED_NEIGHBORS,

@@ -11,7 +11,7 @@ public enum Hero {
 	 * RED HEROS
 	 */
 	
-	AXE(7, 2, 11),
+	AXE(6, 2, 10),
 	BEASTMASTER(5, 0, 12),
 	BRISTLEBACK(8, 0, 12, HeroAbility.BARROOM_BRAWLER),
 	CENTAUR_WARRUNNER(4, 0, 14, HeroAbility.RETURN),
@@ -35,7 +35,7 @@ public enum Hero {
 	LUNA(3, 0, 8, HeroAbility.LUCENT_BEAM),
 	MEEPO(4, 0, 5),
 	OGRE_MAGI(3, 0, 7),
-	OUTWORLD_DEVOURER(4, 0, 6),
+	OUTWORLD_DEVOURER(4, 0, 7),
 	PRELLEX(3, 0, 5),
 	SKYWRATH_MAGE(3, 0, 6),
 	VENOMANCER(2, 0, 6),
@@ -62,7 +62,7 @@ public enum Hero {
 	 * BLACK HEROS
 	 */
 	
-	BLOODSEEKER(7, 0, 6, HeroAbility.BLOOD_BATH),
+	BLOODSEEKER(7, 0, 7, HeroAbility.BLOOD_BATH),
 	BOUNTY_HUNTER(7, 0, 7, HeroAbility.JINADA),
 	DEBBI(7, 0, 5, HeroAbility.METICULOUS_PLANNER),
 	LICH(5, 0, 9),

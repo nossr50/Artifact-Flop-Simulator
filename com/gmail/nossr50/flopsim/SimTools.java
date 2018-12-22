@@ -14,8 +14,22 @@ public class SimTools {
 		String editedString = bigString.replace('_', ' '); //Replace underscores
 		
 		String start = editedString.substring(0, 1).toUpperCase();
-		String end = editedString.substring(1, maxLength-1).toLowerCase();
+		
+		String end = "";
+		
+		if(editedString.length() < maxLength)
+			end = editedString.substring(1);
+		else
+			end = editedString.substring(1, maxLength).toLowerCase();
 		
 		return start+end;
+	}
+
+	public static String getDebugFormat(String debugName, String debugInfo)
+	{
+		String prefix = " [";
+		String suffix = "] ";
+		String combined = prefix + debugName + ": " + debugInfo + suffix;
+		return combined;
 	}
 }

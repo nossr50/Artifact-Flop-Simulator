@@ -4,5 +4,6 @@ public enum EntityStat {
 	HEALTH,
 	MAX_HEALTH,
 	ARMOR,
-	ATTACK;
+	ATTACK,
+	REGEN
 }
