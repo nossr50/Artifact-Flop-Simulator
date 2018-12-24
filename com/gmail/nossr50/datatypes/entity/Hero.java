@@ -83,18 +83,18 @@ public enum Hero {
 	//Abilities
 	public HeroAbility at = HeroAbility.MISSING_ABILITY; //Default to nothing
 	
-	Hero(int stat_1, int stat_2, int stat_3)
+	Hero(int heroAttack, int heroArmor, int heroHealth)
 	{
-		this.heroHealth = stat_1;
-		this.heroArmor = stat_2;
-		this.heroAttack = stat_3;
+		this.heroAttack = heroAttack;
+		this.heroArmor = heroArmor;
+		this.heroHealth = heroHealth;
 	}
 	
-	Hero(int stat_1, int stat_2, int stat_3, HeroAbility at)
+	Hero(int heroAttack, int heroArmor, int heroHealth, HeroAbility at)
 	{
-		this.heroHealth = stat_1;
-		this.heroArmor = stat_2;
-		this.heroAttack = stat_3;
-		this.at 	= at;
+		this.heroAttack = heroAttack;
+		this.heroArmor = heroArmor;
+		this.heroHealth = heroHealth;
+		this.at = at;
 	}
 }

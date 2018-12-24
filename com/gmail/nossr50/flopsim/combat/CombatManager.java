@@ -23,33 +23,54 @@ public class CombatManager {
 		this.currentTurn = currentTurn;
 		this.currentCombatants = currentCombatants;
 	}
+
+	/**
+	 * Handles everything that needs to be done for the current phase
+	 */
+	public void executeTurn()
+	{
+		if(currentPhase == AbilityPriority.AFTER_COMBAT)
+		{
+			executeCombatTurn();
+		} else {
+			executeAbilitiesFiringNow();
+		}
+	}
 	
-//	public void executeCombatTurn()
-//	{
-//		/*
-//		 * First apply pre-combat effects
-//		 */
-//
-//		for(CombatEntity ce : combatants)
-//		{
-//			CombatTarget target = ce.getCombatTarget();
-//
-//			if(ce.hasAbility())
-//			{
-//				//ce.getAbility().addQueuedAbilityInteraction();
-//			}
-//		}
-//	}
-//
-//	private void simAttacks()
-//	{
-//
-//	}
+	private void executeCombatTurn()
+	{
+
+		//Deal melee damage
+		for(CombatEntity currentAttacker : currentCombatants)
+		{
+			CombatEntity targetEntity = currentAttacker.getCombatTarget().getTarget(); //This is the unit that will be taking direct damage from our current entity
+			targetEntity.dealMeleeCombatDamage(currentAttacker, currentTurn);
+		}
+
+		/*
+		Go through the final phases of combat (stat modification, regen, and death)
+		 */
+		for(CombatEntity currentCombatant : currentCombatants)
+		{
+			executeAbilitiesFiringNow();
+			currentCombatant.applyRegen(); //This is applied after damage has been taken but before death is checked for
+			updateEntities(); //Always fire dead last
+		}
+
+	}
+
+	private void updateEntities()
+	{
+		for(CombatEntity currentCombatant : currentCombatants) {
+			currentCombatant.updateStats(); //Changes any stats which may have been altered from ability interactions or direct combat damage
+			currentCombatant.deathCheck(); //See if the entity died, and if it died flag it as dead
+		}
+	}
 	
-	public void executeAbilitiesFiringNow()
+	private void executeAbilitiesFiringNow()
 	{
 		triggerAbilities(); //Trigger abilities
-
+		updateEntities(); //Update stats and check for deaths
 	}
 
 	private void triggerAbilities() {
@@ -64,14 +85,5 @@ public class CombatManager {
 				currentCombatant.getAbility().addAbilityInteraction(currentTurn);
 			}
 		}
-
-		/**
-		 * Execute the results of those interactions
-		 */
-		for (CombatEntity currentCombatant : currentCombatants) {
-
-		}
 	}
-
-
 }

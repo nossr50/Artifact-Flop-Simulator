@@ -28,6 +28,8 @@ public class CombatEntity extends LaneEntity {
     private int currentHealth;
     private int currentArmor;
     private int currentAttack;
+    private DamageType damageType;
+    private boolean isDead;
 
     private ArrayList<Aura> currentAuras;
 
@@ -62,6 +64,7 @@ public class CombatEntity extends LaneEntity {
         this.baseArmor = baseArmor;
         this.baseAttack = baseAttack;
         this.heroAbility = heroAbility;
+        this.isDead = false;
 
         this.entityAlignment = entityAlignment;
 
@@ -69,6 +72,7 @@ public class CombatEntity extends LaneEntity {
         this.maxHealth = this.baseHealth;
         this.currentArmor = this.baseArmor;
         this.currentAttack = this.baseAttack;
+        this.damageType = DamageType.NORMAL; //For now all entities in artifact deal non-piercing damage by default
 
         this.entityName = entityName;
 
@@ -141,7 +145,7 @@ public class CombatEntity extends LaneEntity {
 
     public boolean isAlive()
     {
-        return (currentHealth > 0);
+        return !isDead;
     }
 
     public int getUID() {
@@ -256,6 +260,24 @@ public class CombatEntity extends LaneEntity {
         maxHealth += pendingStatChange.get(EntityStat.MAX_HEALTH);
         currentAttack += pendingStatChange.get(EntityStat.ATTACK);
         currentArmor += pendingStatChange.get(EntityStat.ARMOR);
+
+        //Reset the values
+        for (EntityStat entityStat : pendingStatChange.keySet()) {
+            pendingStatChange.put(entityStat, 0);
+        }
+    }
+
+    /**
+     * When this is called we check if the CombatEntity has health below or equal to zero, if that is the case we flag it as dead.
+     * This should only be called after all abilities fire in a given phase, because some abilities can fire simultaneously and keep a unit alive
+     */
+    public void deathCheck()
+    {
+        if(currentHealth <= 0)
+        {
+            this.isDead = true; //Flag entity dead
+            System.out.println(this.toString()+" has died!");
+        }
     }
 
     /**
@@ -263,18 +285,22 @@ public class CombatEntity extends LaneEntity {
      *
      * @param source Source of the melee combat damage
      */
-    public void dealMeleeCombatDamage(@NotNull CombatEntity source, @NotNull Turn turn, DamageType damageType) {
-        int incDamage = source.getCurrentAttack();
+    public void dealMeleeCombatDamage(@NotNull CombatEntity source, @NotNull Turn turn) {
+        System.out.println("Attacker "+source.toString()+" has an attack value of "+source.getCurrentAttack());
 
-        dealDamage(incDamage, damageType);
+        dealDamage(source.getCurrentAttack(), source.getDamageType()); //Deal melee damage
 
         //Trigger any defensive skills
-        if (getAbility().isTriggeredOnDefense()) {
+        if (this.hasAbility() && getAbility().isTriggeredOnDefense()) {
             getAbility().triggerDefensiveSkill(source, turn);
         }
     }
 
     private void dealDamage(int incDamage, DamageType damageType) {
+        System.out.println("Dealing damage to "+this.toString()); //debug
+
+        System.out.println("Damage value pre-reduction is "+incDamage);
+
         int damageReduction = 0;
 
         if(damageType == DamageType.NORMAL)
@@ -282,15 +308,35 @@ public class CombatEntity extends LaneEntity {
 
         int endResult = incDamage - damageReduction;
 
-        int regenValue = getRegen();
-
-        endResult+= regenValue;
+        System.out.println("Damage value post-reduction is "+endResult);
 
         if(endResult > 0)
             addPendingStatChange(EntityStat.HEALTH, -endResult); //Queue up the negative change in health
 
         //TODO: Apply damage, flag entity as dead, don't let max health go out of range
         //TODO: getCurrentArmor should account for auras, same for attack and other stats
+    }
+
+    /**
+     * For now all entities deal normal damage in melee, but its possible in future updates there will be heros that have built in piercing damage
+     * @return The damage type this entity deals
+     */
+    public DamageType getDamageType() {
+        return this.damageType;
+    }
+
+    /**
+     * Apply regen to the entity, for now this only happens at the end of combat
+     */
+    public void applyRegen()
+    {
+        int regenValue = getRegen();
+
+        if(regenValue > 0) {
+            System.out.println("Applying regen to " + this.toString());
+
+            addPendingStatChange(EntityStat.HEALTH, regenValue);
+        }
     }
 
 

@@ -139,10 +139,6 @@ public class Lane {
         }
     }
 
-    private void executeAbilities() {
-        //Executes all abilities waiting to happen
-    }
-
     /*
      * This is where we apply combat modifiers and execute any pre-action phase stuff
      */
@@ -152,8 +148,7 @@ public class Lane {
         /*
          * Check for any pre-action abilities and then execute them
          */
-        executeAbilitiesFiringNow(AbilityPriority.PRE_ACTION);
-
+        executePhase(AbilityPriority.PRE_ACTION, LanePhaseFlags.CLEANUP_LANE);
 
         /*
          * Add stats about any blocked Radiant heros
@@ -167,11 +162,24 @@ public class Lane {
         printDebugPostDeployStatus();
     }
 
-    private void executeAbilitiesFiringNow(AbilityPriority ap) {
+    private void executePhase(AbilityPriority ap, LanePhaseFlags flags) {
         printLaneASCIIArt(); //Debug
         CombatManager cm = new CombatManager(combatEntities, ap, currentTurn); //Make new CM
+        cm.executeTurn();
 
-        cm.executeAbilitiesFiringNow();
+        //TODO: lane cleanup
+        if(flags == LanePhaseFlags.CLEANUP_LANE)
+        {
+            laneCleanup(); //Clean up dead entities etc
+        }
+    }
+
+    /**
+     * During certain phases of the laning stage we will check for dead entities and cleanup the lane
+     */
+    private void laneCleanup()
+    {
+        System.out.println("Cleaning up the lane!");
     }
 
     private void registerTargets() {
@@ -240,12 +248,17 @@ public class Lane {
      */
     private void initPreCombat() {
         System.out.println("Starting pre-combat");
+
+        //Execute the pre-combat abilities
+        executePhase(AbilityPriority.PRE_COMBAT, LanePhaseFlags.NO_CHANGES);
+
         initCombat();
     }
 
     private void initCombat() {
         System.out.println("Starting combat");
 
+        executePhase(AbilityPriority.AFTER_COMBAT, LanePhaseFlags.NO_CHANGES); //Entities punch each other during this phase
     }
 
     /**
@@ -253,6 +266,8 @@ public class Lane {
      */
     private void initPostCombat() {
         System.out.println("Starting post-combat...");
+
+        executePhase(AbilityPriority.END_OF_COMBAT, LanePhaseFlags.CLEANUP_LANE); //This handles abilities that required things to die
     }
 
     private void initFirstDeployment() {
@@ -278,6 +293,8 @@ public class Lane {
 
         registerTargets(); //Get target data
         updateLanePositions(deployed_Enemies, deployed_Friendlies);
+
+        //TODO: Code in drow aura
     }
 
     private void updateLanePositions(LaneEntity[] direEntities, @NotNull LaneEntity[] radiantEntities) {
