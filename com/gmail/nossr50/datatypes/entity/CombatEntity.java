@@ -8,6 +8,7 @@ import com.gmail.nossr50.datatypes.lane.LanePosition;
 import com.gmail.nossr50.datatypes.record.Turn;
 import com.gmail.nossr50.flopsim.SimTools;
 import com.gmail.nossr50.flopsim.combat.AbilityInteraction;
+import com.gmail.nossr50.flopsim.combat.CombatRecord;
 import com.gmail.nossr50.flopsim.combat.CombatTarget;
 import com.gmail.nossr50.flopsim.combat.DamageType;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +43,7 @@ public class CombatEntity extends LaneEntity {
     private ArrayList<AbilityInteraction> queuedInteractions;
     private ArrayList<AbilityInteraction> removedInteractions;
     private ArrayList<AbilityInteraction> activeCombatModifierInteractions;
+    private HashMap<Integer, CombatRecord> damageMap; //Tracks history of damage interactions
 
 
     //Special properties
@@ -85,6 +87,7 @@ public class CombatEntity extends LaneEntity {
         activeCombatModifierInteractions = new ArrayList<>();
         currentAuras = new ArrayList<>(); //Init auras
         pendingStatChange = new HashMap<>();
+        damageMap = new HashMap<Integer, CombatRecord>();
 
         for (EntityStat es : EntityStat.values()) {
             pendingStatChange.put(es, 0);
@@ -200,47 +203,6 @@ public class CombatEntity extends LaneEntity {
         queuedInteractions.add(newInteraction);
     }
 
-    public void executeQueuedAbilityInteractions() throws InvalidAbilityException {
-        //Execute all queued interactions
-        for (AbilityInteraction ai : queuedInteractions) {
-            //Normal AbilityType refers to a plain stat change effect rather than a scripted complex interaction
-            if (ai.at == AbilityType.NORMAL) {
-                switch (ai.amt) {
-                    case AURA_ARMOR:
-                        addAura(new Aura(ai));
-                        break;
-                    case AURA_ATTACK:
-                        addAura(new Aura(ai));
-                        break;
-                    case AURA_REGEN:
-                        addAura(new Aura(ai));
-                        break;
-                    case MODIFY_ARMOR:
-                        addPendingStatChange(ai.getTargetStat(), ai.abilityValue);
-                        break;
-                    case MODIFY_HEALTH:
-                        dealDamage(ai.abilityValue, DamageType.NORMAL);
-                        break;
-                    case MODIFY_ATTACK:
-                        addPendingStatChange(ai.getTargetStat(), ai.abilityValue);
-                        break;
-                    case REGEN:
-                        addPendingStatChange(ai.getTargetStat(), ai.abilityValue);
-                        break;
-                    case RETALIATE:
-                        dealDamage(ai.abilityValue, DamageType.NORMAL);
-                        break;
-                    case CLEAVE:
-                        dealDamage(ai.abilityValue, DamageType.NORMAL);
-                        break;
-                    case PIERCE_DAMAGE:
-                        dealDamage(ai.abilityValue, DamageType.PIERCE);
-                        break;
-                }
-            }
-        }
-    }
-
     private void addAura(Aura newAura)
     {
         //TODO: Remove this debug
@@ -256,6 +218,7 @@ public class CombatEntity extends LaneEntity {
     }
 
     public void updateStats() {
+        //System.out.println("Updating stat Health from "+currentHealth+" to "+(currentHealth+pendingStatChange.get(EntityStat.HEALTH)));
         currentHealth += pendingStatChange.get(EntityStat.HEALTH);
         maxHealth += pendingStatChange.get(EntityStat.MAX_HEALTH);
         currentAttack += pendingStatChange.get(EntityStat.ATTACK);
@@ -265,6 +228,10 @@ public class CombatEntity extends LaneEntity {
         for (EntityStat entityStat : pendingStatChange.keySet()) {
             pendingStatChange.put(entityStat, 0);
         }
+
+        //Don't let current health go above max health
+        if(currentHealth > maxHealth)
+            currentHealth = maxHealth;
     }
 
     /**
@@ -273,7 +240,7 @@ public class CombatEntity extends LaneEntity {
      */
     public void deathCheck()
     {
-        if(currentHealth <= 0)
+        if(!isDead && currentHealth <= 0)
         {
             this.isDead = true; //Flag entity dead
             System.out.println(this.toString()+" has died!");
@@ -288,7 +255,7 @@ public class CombatEntity extends LaneEntity {
     public void dealMeleeCombatDamage(@NotNull CombatEntity source, @NotNull Turn turn) {
         System.out.println("Attacker "+source.toString()+" has an attack value of "+source.getCurrentAttack());
 
-        dealDamage(source.getCurrentAttack(), source.getDamageType()); //Deal melee damage
+        dealDamage(source.getCurrentAttack(), source.getDamageType(), source, turn); //Deal melee damage
 
         //Trigger any defensive skills
         if (this.hasAbility() && getAbility().isTriggeredOnDefense()) {
@@ -296,7 +263,7 @@ public class CombatEntity extends LaneEntity {
         }
     }
 
-    private void dealDamage(int incDamage, DamageType damageType) {
+    private boolean dealDamage(int incDamage, DamageType damageType, @NotNull CombatEntity source, @NotNull Turn turn) {
         System.out.println("Dealing damage to "+this.toString()); //debug
 
         System.out.println("Damage value pre-reduction is "+incDamage);
@@ -310,8 +277,16 @@ public class CombatEntity extends LaneEntity {
 
         System.out.println("Damage value post-reduction is "+endResult);
 
+        //Record the damage interaction
+        damageMap.put(source.getUID(), new CombatRecord(source, this, turn, endResult));
+
         if(endResult > 0)
+        {
             addPendingStatChange(EntityStat.HEALTH, -endResult); //Queue up the negative change in health
+            return true; //Damage was dealt
+        } else {
+            return false; //Damage was not dealt
+        }
 
         //TODO: Apply damage, flag entity as dead, don't let max health go out of range
         //TODO: getCurrentArmor should account for auras, same for attack and other stats
@@ -368,6 +343,17 @@ public class CombatEntity extends LaneEntity {
 
     public LanePosition getLanePosition() {
         return lp;
+    }
+
+    public int getDamageRecord(CombatEntity damageSource)
+    {
+        if(damageMap.get(damageSource.getUID()) != null)
+        {
+            return damageMap.get(damageSource.getUID()).getDamageDealt();
+        } else {
+            System.out.println("Damage map entry was null!");
+            return 0;
+        }
     }
 
     @NotNull

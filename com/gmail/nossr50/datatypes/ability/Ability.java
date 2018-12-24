@@ -53,14 +53,14 @@ public class Ability {
         LanePosition lp = source.getLanePosition(); //LanePosition has positional data relating to abilities
 
         //DEBUG
-        if(lp == null)
-            System.out.println("LP is null!");
-        if(lp.getEnemyNeighbors() == null)
-            System.out.println("Enemy neighbors are null");
-        if(lp.getAlliedNeighbors() == null)
-            System.out.println("Allied neighbors are null");
-        if(lp.getEnemiesInLane() == null)
-            System.out.println("Enemies in lane are null");
+//        if(lp == null)
+//            System.out.println("LP is null!");
+//        if(lp.getEnemyNeighbors() == null)
+//            System.out.println("Enemy neighbors are null");
+//        if(lp.getAlliedNeighbors() == null)
+//            System.out.println("Allied neighbors are null");
+//        if(lp.getEnemiesInLane() == null)
+//            System.out.println("Enemies in lane are null");
 
         ArrayList<CombatEntity> abilityTargets = new ArrayList<>();
         //This grabs all applicable targets for an ability, and its empty if there are none.
@@ -120,11 +120,15 @@ public class Ability {
     private void addAbilityInteraction(@NotNull Turn turn, ArrayList<CombatEntity> abilityTargets) {
         for (CombatEntity target : abilityTargets) {
             if (getConditionsFulfilled(target)) {
-                System.out.println("[DEBUG] Adding ability interaction from " + source.toString() + " via " + heroAbility.toString());
-                AbilityInteraction newInteraction = new AbilityInteraction(source, target, heroAbility.getModifierType(), heroAbility.getAbilityType(), getValue(), turn);
-                target.addQueuedAbilityInteraction(newInteraction);
+                addInteraction(turn, target);
             }
         }
+    }
+
+    private void addInteraction(@NotNull Turn turn, CombatEntity target) {
+        System.out.println("[DEBUG] Adding ability interaction from " + source.toString() + " via " + heroAbility.toString());
+        AbilityInteraction newInteraction = new AbilityInteraction(source, target, heroAbility.getModifierType(), heroAbility.getAbilityType(), getValue(), turn);
+        target.addQueuedAbilityInteraction(newInteraction);
     }
 
     public boolean isTriggeredOnDefense() {
@@ -192,6 +196,10 @@ public class Ability {
                 if (!target.isAlive())
                     return true;
             case DAMAGE_ABOVE_ZERO:
+                //Check if damage was above zero
+                //TODO: make this turn based
+                if(target.getDamageRecord(source) > 0)
+                    return true;
             case RANDOM_CHANCE:
             case HERO_BLOCKER_DIES:
             case ENEMY_NEIGHBOR_DIES:

@@ -105,19 +105,15 @@ public class Lane {
                 break;
             case FINISHED:
                 break;
-            case FRESH:
-                DeployEntities();
-                state = LaneState.DEPLOYED;
-                break;
             case PRE_DEPLOYMENT:
                 DeployEntities();
                 state = LaneState.DEPLOYED;
                 break;
             case PRE_ACTION:
                 initPreAction();
-                state = LaneState.PRE_COMBAT;
+                state = LaneState.COMBAT;
                 break;
-            case PRE_COMBAT:
+            case COMBAT:
                 initPreCombat();
                 state = LaneState.POST_COMBAT;
                 break;
@@ -244,21 +240,25 @@ public class Lane {
     }
 
     /**
-     * This is where buffs and modifiers will be applied
+     * Go through all stages of combat
      */
     private void initPreCombat() {
         System.out.println("Starting pre-combat");
 
-        //Execute the pre-combat abilities
-        executePhase(AbilityPriority.PRE_COMBAT, LanePhaseFlags.NO_CHANGES);
 
-        initCombat();
-    }
 
-    private void initCombat() {
+        /*
+        Combat goes through several phases
+        1) Apply Lane buffs
+        2) Apply any abilities related to dealing damage (WHILE_DEALING_DAMAGE)
+        3) Apply abilities that required having dealt damage (AFTER_DAMAGE_DEALT)
+
+         */
+        executePhase(AbilityPriority.LANE_BUFF, LanePhaseFlags.NO_CHANGES);
+        executePhase(AbilityPriority.WHILE_DEALING_DAMAGE, LanePhaseFlags.NO_CHANGES);
+        executePhase(AbilityPriority.AFTER_DAMAGE_DEALT, LanePhaseFlags.NO_CHANGES); //Entities punch each other during this phase
+
         System.out.println("Starting combat");
-
-        executePhase(AbilityPriority.AFTER_COMBAT, LanePhaseFlags.NO_CHANGES); //Entities punch each other during this phase
     }
 
     /**
@@ -267,7 +267,7 @@ public class Lane {
     private void initPostCombat() {
         System.out.println("Starting post-combat...");
 
-        executePhase(AbilityPriority.END_OF_COMBAT, LanePhaseFlags.CLEANUP_LANE); //This handles abilities that required things to die
+        executePhase(AbilityPriority.AFTER_DAMAGE, LanePhaseFlags.CLEANUP_LANE); //This handles abilities that required things to die
     }
 
     private void initFirstDeployment() {

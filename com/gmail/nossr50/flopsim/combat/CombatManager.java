@@ -14,37 +14,28 @@ import com.gmail.nossr50.datatypes.record.Turn;
 public class CombatManager {
 
 	private ArrayList<CombatEntity> currentCombatants;
-	private AbilityPriority currentPhase;
 	private Turn currentTurn;
 
 
 	public CombatManager(ArrayList<CombatEntity> currentCombatants, AbilityPriority currentPhase, Turn currentTurn) {
-		this.currentPhase = currentPhase;
 		this.currentTurn = currentTurn;
 		this.currentCombatants = currentCombatants;
-	}
-
-	/**
-	 * Handles everything that needs to be done for the current phase
-	 */
-	public void executeTurn()
-	{
-		if(currentPhase == AbilityPriority.AFTER_COMBAT)
-		{
-			executeCombatTurn();
-		} else {
-			executeAbilitiesFiringNow();
-		}
 	}
 	
 	private void executeCombatTurn()
 	{
+		//First activate lane buffs
+		triggerAbilities(AbilityPriority.LANE_BUFF); //Buffs from just being in the lane
+		//TODO: Trigger conditional lane buffs here?
+		//triggerAbilities(AbilityPriority.CONDITIONAL_COMBAT_TARGET_BUFF); //Buffs from attacking specific units
 
+		//TODO: Trigger abilities that activate while attacking (cleave)
 		//Deal melee damage
 		for(CombatEntity currentAttacker : currentCombatants)
 		{
 			CombatEntity targetEntity = currentAttacker.getCombatTarget().getTarget(); //This is the unit that will be taking direct damage from our current entity
-			targetEntity.dealMeleeCombatDamage(currentAttacker, currentTurn);
+			targetEntity.dealMeleeCombatDamage(currentAttacker, currentTurn); //Deal melee damage
+			//TODO: Fury swipes isn't firing correctly
 		}
 
 		/*
@@ -52,7 +43,7 @@ public class CombatManager {
 		 */
 		for(CombatEntity currentCombatant : currentCombatants)
 		{
-			executeAbilitiesFiringNow();
+			triggerAbilities(currentPhase); //Trigger abilities
 			currentCombatant.applyRegen(); //This is applied after damage has been taken but before death is checked for
 			updateEntities(); //Always fire dead last
 		}
@@ -69,11 +60,11 @@ public class CombatManager {
 	
 	private void executeAbilitiesFiringNow()
 	{
-		triggerAbilities(); //Trigger abilities
+		triggerAbilities(currentPhase); //Trigger abilities
 		updateEntities(); //Update stats and check for deaths
 	}
 
-	private void triggerAbilities() {
+	private void triggerAbilities(AbilityPriority currentPhase) {
 		/**
 		 * Apply ability interactions
 		 */
@@ -81,6 +72,7 @@ public class CombatManager {
 			//Check if the ability of the current combatant fires during this phase
 			if(currentCombatant.hasAbility() && currentCombatant.getAbility().doesAbilityTriggerNow(currentPhase))
 			{
+				System.out.println(currentCombatant.toString() +" has ability firing now!");
 				//Apply new AbilityInteraction(s) to all appropriate targets
 				currentCombatant.getAbility().addAbilityInteraction(currentTurn);
 			}

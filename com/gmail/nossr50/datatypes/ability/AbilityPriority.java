@@ -5,10 +5,11 @@ package com.gmail.nossr50.datatypes.ability;
  * When applying abilities we need to know when to trigger their effects
  */
 public enum AbilityPriority {
-	DAMAGE_DEALT, //Happens before the end of combat
-	END_OF_COMBAT, //Happens before we check if heros died (Regens)
-	AFTER_COMBAT, //Happens after heros have died
-	PRE_ACTION, //before pre-combat
-	PRE_COMBAT, //before combat
-	ON_DEPLOY //If the hero is on the board its applied
+	GLOBAL_BUFF,
+	LANE_BUFF,
+	CONDITIONAL_COMBAT_TARGET_BUFF,
+	ENTERING_PRE_ACTION,
+	WHILE_DEALING_DAMAGE,
+	AFTER_DAMAGE_DEALT,
+	AFTER_COMBAT_ENDS
 }
